@@ -70,8 +70,8 @@ on:
   push: *ignore-paths
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.leg || 'push' }}
-  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ inputs.leg || 'push' }}-${{ inputs.racecar_run }}
+  cancel-in-progress: false
 
 env:
   CHALK_ON: ${{ github.event_name == 'workflow_dispatch' && inputs.leg != 'baseline' }}
