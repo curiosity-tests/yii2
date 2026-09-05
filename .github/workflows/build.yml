@@ -18,20 +18,6 @@ name: build
 #      dispatch cancelled the first. Also cancellation-only, never a build change.
 # Build and test COMMANDS are unchanged from upstream.
 
-# racecar fork-testbed patch. Changes from upstream:
-#   1. workflow_dispatch with a `leg` input so racecar can drive the run and pick
-#      baseline vs instrumented.
-#   2. actions/checkout -> crashappsec/action-checkout, which wraps checkout and
-#      setup-chalk-action; `chalk:` is the only variable separating the arms.
-#   3. permissions: id-token: write for the action's OIDC connect (the block
-#      zeroes unlisted scopes, so everything upstream relied on is restated).
-#   4. A fail-closed assertion on the instrumented arm.
-#   5. fail-fast: false on every matrix -- a measurement-integrity change, not a
-#      build change: the instrumented arm has strictly more failure surface, so
-#      leaving fail-fast on cancels instrumented siblings more often than
-#      baseline ones and biases the comparison.
-# Build and test COMMANDS are unchanged from upstream.
-
 permissions:
   contents: read
   id-token: write
@@ -41,19 +27,6 @@ run-name: "build ${{ inputs.leg || 'push' }} ${{ inputs.racecar_run }}"
 on:
   workflow_dispatch:
     inputs:
-      leg:
-        description: "baseline (uninstrumented) or instrumented (under chalk/curiosity)"
-        type: choice
-        options: [instrumented, baseline]
-        default: instrumented
-      profile:
-        description: "CrashOverride chalk profile"
-        type: string
-        default: curiosity-tests-racecar
-      racecar_run:
-        description: "racecar correlation token, echoed into the run name"
-        type: string
-        default: ""
       leg:
         description: "baseline (uninstrumented) or instrumented (under chalk/curiosity)"
         type: choice
@@ -101,7 +74,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  CHALK_ON: ${{ github.event_name == 'workflow_dispatch' && inputs.leg != 'baseline' }}
   CHALK_ON: ${{ github.event_name == 'workflow_dispatch' && inputs.leg != 'baseline' }}
   PHP_EXTENSIONS: curl, dom, imagick, intl, mbstring, mcrypt, memcached
   PHP_INI_VALUES: apc.enabled=1,apc.shm_size=32M,apc.enable_cli=1, date.timezone='UTC'
