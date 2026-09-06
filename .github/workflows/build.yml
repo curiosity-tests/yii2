@@ -74,7 +74,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  CHALK_ON: ${{ github.event_name == 'workflow_dispatch' && inputs.leg != 'baseline' }}
+  CHALK_ON: ${{ inputs.leg == 'instrumented' }}
   PHP_EXTENSIONS: curl, dom, imagick, intl, mbstring, mcrypt, memcached
   PHP_INI_VALUES: apc.enabled=1,apc.shm_size=32M,apc.enable_cli=1, date.timezone='UTC'
   PHPUNIT_EXCLUDE_GROUP: db,wincache
